@@ -246,7 +246,7 @@ const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCpJQR85jQOiwitPAunRZY790JLRGUwLsQ",
   authDomain: "bus-app-a834f.firebaseapp.com",
   projectId: "bus-app-a834f",
-  databaseURL: "https://bus-app-a834f-default-rtdb.firebaseio.com",
+  databaseURL: "https://bus-app-a834f-default-rtdb.asia-southeast1.firebasedatabase.app",
   storageBucket: "bus-app-a834f.firebasestorage.app",
   messagingSenderId: "162222358621",
   appId: "1:162222358621:web:7b054ab3da0d636c1c4db4",
@@ -280,7 +280,7 @@ function normPhone(v){
 }
 
 /* ---------- الحالة ---------- */
-let FS=null, RT=null, unsub=[];
+let FS=null, RT=null, RT_OK=false, unsub=[];
 const A={phone:'',buses:[],bus:null,students:[],lights:{}};
 const SESSION_KEY='qaid.session', GPS_KEY='qaid.gps';
 
@@ -291,7 +291,7 @@ function initFirebase(){
     if(!window.firebase) throw new Error('sdk');
     if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
     FS=firebase.firestore();
-    try{RT=firebase.database();RT.ref('.info/connected').on('value',s=>setConn(s.val()?'live':'bad',s.val()?'متصل':'غير متصل'))}catch(e){console.warn('rtdb',e);setConn('live','متصل')}
+    try{RT=firebase.database();RT.ref('.info/connected').on('value',s=>{RT_OK=!!s.val();setConn(RT_OK?'live':'bad',RT_OK?'متصل':'غير متصل');if(!RT_OK&&G.on){G.err='لا يوجد اتصال بقاعدة بيانات الموقع (Realtime Database). تحقّق من الإنترنت ومن رابط databaseURL.';renderGps()}})}catch(e){console.warn('rtdb',e);setConn('live','متصل')}
     return true;
   }catch(e){console.error(e);setConn('bad','غير متصل');return false}
 }
@@ -486,9 +486,12 @@ function send(pt){
   if(!G.ref) return;
   const b=A.bus;
   G.lastSent=Date.now(); G.sentPt=pt;
+  /* set() لا يفشل ولا ينجح إذا لم يتصل SDK بالقاعدة (يبقى في الطابور)، لذا نراقبه بمهلة */
+  let done=false;
+  setTimeout(()=>{if(!done&&G.on){G.err='لم يُرسل الموقع: لا يصل التطبيق إلى Realtime Database. تأكد أن القاعدة مُنشأة وأن databaseURL صحيح.';renderGps()}},10000);
   G.ref.set(Object.assign({},pt,{ts:firebase.database.ServerValue.TIMESTAMP,active:true,busId:b.id,code:String(b.f.code||''),driver:busName(b)}))
-    .then(()=>{G.sentAt=Date.now();if(G.err.startsWith('لم يُرسل')){G.err='';renderGps()}})
-    .catch(e=>{console.error(e);G.err=e&&e.code==='PERMISSION_DENIED'?'لم يُرسل الموقع: قواعد Realtime Database تمنع الكتابة.':'لم يُرسل الموقع: تحقّق من الإنترنت.';renderGps()});
+    .then(()=>{done=true;G.sentAt=Date.now();if(G.err.startsWith('لم يُرسل')||G.err.startsWith('لا يوجد اتصال')){G.err='';renderGps()}})
+    .catch(e=>{done=true;console.error(e);G.err=e&&e.code==='PERMISSION_DENIED'?'لم يُرسل الموقع: قواعد Realtime Database تمنع الكتابة.':'لم يُرسل الموقع: تحقّق من الإنترنت.';renderGps()});
 }
 async function wakeOn(){try{if('wakeLock' in navigator&&document.visibilityState==='visible'){G.wake=await navigator.wakeLock.request('screen')}}catch(e){}}
 function wakeOff(){try{G.wake&&G.wake.release()}catch(e){} G.wake=null}
