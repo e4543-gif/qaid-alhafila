@@ -69,19 +69,13 @@ select.field{appearance:none;background-image:linear-gradient(45deg,transparent 
 .err{color:var(--red);font-size:.88rem;margin-top:12px;min-height:1.4em}
 .boot{padding:22vh 0;text-align:center;color:var(--muted)}
 .boot-acts{display:flex;gap:10px;justify-content:center;margin-top:18px}
-/* رمز الدولة + رقم الهاتف، ورمز التحقق SMS */
+/* رمز الدولة + رقم الهاتف، والرمز السري */
 .phone-row{display:flex;gap:10px;direction:ltr}
 .phone-row .field{flex:1;min-width:0}
 .cc{border-radius:15px;padding:0 14px;display:grid;place-items:center;flex:none;font-weight:600;color:var(--muted);font-size:1.1rem;font-variant-numeric:tabular-nums}
-.otp{direction:ltr;text-align:center;font-size:1.7rem;letter-spacing:.45em;padding-left:calc(16px + .45em);font-variant-numeric:tabular-nums}
-.otp::placeholder{letter-spacing:.3em;color:var(--faint)}
-.ph-ltr{direction:ltr;unicode-bidi:isolate;display:inline-block;color:var(--ink)}
-.otp-links{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px}
-.link{border:0;background:none;color:var(--indigo);font-weight:500;padding:6px 2px;font-size:.88rem;box-shadow:none}
-.link:disabled{color:var(--faint);cursor:default}
-.legal{margin-top:14px;font-size:.72rem;color:var(--faint);line-height:1.5}
-.legal a{color:inherit}
-.grecaptcha-badge{visibility:hidden!important}
+.login .pin-l{margin-top:18px}
+.pin{direction:ltr;text-align:center;font-size:1.7rem;letter-spacing:.45em;padding-left:calc(16px + .45em);font-variant-numeric:tabular-nums}
+.pin::placeholder{letter-spacing:.3em;color:var(--faint)}
 
 /* الملف الشخصي */
 .who{border-radius:var(--r-lg);padding:20px;margin-bottom:22px}
@@ -207,35 +201,19 @@ h2.sec small{color:var(--muted);font-weight:400;font-size:.8rem}
   </main>
 
   <main id="v-login" hidden>
-    <!-- الخطوة 1: رقم الهاتف -->
     <form class="login raised" id="login-form" novalidate>
       <h2>دخول السائق</h2>
-      <p>أدخل رقم هاتفك المسجّل لدى إدارة المدرسة، وسيصلك رمز تحقق في رسالة نصية.</p>
+      <p>أدخل رقم هاتفك المسجّل لدى إدارة المدرسة والرمز السري.</p>
       <label for="phone">رقم هاتف السائق</label>
       <div class="phone-row">
         <span class="cc inset" aria-hidden="true">+968</span>
         <input class="field phone" id="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="9xxxxxxx" required>
       </div>
-      <button class="btn primary" type="submit" id="login-btn">إرسال رمز التحقق</button>
+      <label class="pin-l" for="pin">الرمز السري</label>
+      <input class="field pin" id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="4" placeholder="••••" required>
+      <button class="btn primary" type="submit" id="login-btn">دخول</button>
       <div class="err" id="login-err" role="alert"></div>
-      <div class="legal">هذه الصفحة محمية بـ reCAPTCHA وتنطبق عليها <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">سياسة الخصوصية</a> و<a href="https://policies.google.com/terms" target="_blank" rel="noopener">شروط الخدمة</a> من Google.</div>
     </form>
-
-    <!-- الخطوة 2: رمز SMS -->
-    <form class="login raised" id="otp-form" novalidate hidden>
-      <h2>أدخل رمز التحقق</h2>
-      <p>أرسلنا رمزاً من 6 أرقام إلى <b class="ph-ltr" id="otp-to"></b></p>
-      <label for="otp">رمز التحقق</label>
-      <input class="field otp" id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" required>
-      <button class="btn primary" type="submit" id="otp-btn">تأكيد الدخول</button>
-      <div class="otp-links">
-        <button class="link" type="button" id="otp-resend" disabled>إعادة الإرسال</button>
-        <button class="link" type="button" id="otp-back">تغيير الرقم</button>
-      </div>
-      <div class="err" id="otp-err" role="alert"></div>
-    </form>
-
-    <div id="recaptcha-box"></div>
   </main>
 
   <main id="v-app" hidden>
@@ -278,9 +256,8 @@ h2.sec small{color:var(--muted);font-weight:400;font-size:.8rem}
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<!-- Firebase: Auth للدخول برمز SMS، Firestore لبيانات الحافلات وبطاقات الوصول، و Realtime Database لإرسال الموقع لحظياً -->
+<!-- Firebase: Firestore لبيانات الحافلات وبطاقات الوصول، و Realtime Database لإرسال الموقع لحظياً -->
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-database-compat.js"></script>
 <script>
@@ -302,7 +279,7 @@ const TZ='Asia/Muscat', LOC='ar-OM-u-nu-latn', TRIP_NAME={1:'الأولى',2:'ا
 const GPS_PATH='tracking/';          /* يقرأه تطبيق "حافلات الحواري" من الخريطة */
 const SEND_EVERY_MS=2000, SEND_MOVE_M=15, HEARTBEAT_MS=15000;
 const CC='968';                       /* مفتاح الدولة الافتراضي (عُمان) */
-const RESEND_S=60;                    /* مهلة إعادة إرسال رمز SMS بالثواني */
+const PIN='1122';                     /* الرمز السري الموحّد لجميع السائقين */
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -323,29 +300,18 @@ function normPhone(v){
   s=s.replace(/^00/,''); if(s.length>8&&s.startsWith(CC)) s=s.slice(3);
   return s;
 }
-/* تحويل الرقم إلى الصيغة الدولية E.164 المطلوبة لإرسال SMS.
-   الافتراضي رقم عُماني من 8 أرقام؛ ويُقبل رقم دولي آخر إذا بدأ بـ + أو 00 */
-function toE164(raw){
-  const s=latinDigits(raw).trim(), d=s.replace(/\D/g,'');
-  if(/^(\+|00)/.test(s)){const x=d.replace(/^00/,''); if(!x.startsWith(CC)) return x.length>=8&&x.length<=15?'+'+x:''}
-  const n=normPhone(s);
-  return /^\d{8}$/.test(n)?'+'+CC+n:'';
-}
-const prettyPhone=e=>e.startsWith('+'+CC)?'+'+CC+' '+e.slice(4,8)+' '+e.slice(8):e;
-
 /* ---------- الحالة ---------- */
-let FS=null, RT=null, AUTH=null, RT_OK=false, unsub=[];
-const A={phone:'',uid:'',buses:[],bus:null,students:[],lights:{}};
-const SESSION_KEY='qaid.session', GPS_KEY='qaid.gps';   /* الجلسة نفسها يحفظها Firebase Auth؛ هنا نحفظ آخر حافلة مختارة فقط */
+let FS=null, RT=null, RT_OK=false, unsub=[];
+const A={phone:'',buses:[],bus:null,students:[],lights:{}};
+const SESSION_KEY='qaid.session', GPS_KEY='qaid.gps';   /* الجلسة: رقم السائق وآخر حافلة مختارة، يبقى مسجّلاً حتى يضغط «خروج» */
+function getSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
 
 function setConn(cls,txt){const c=$('#conn');c.className='conn raised-sm '+cls;c.querySelector('span').textContent=txt}
 function view(v){['boot','login','app'].forEach(x=>$('#v-'+x).hidden=x!==v);$('#logout').hidden=v!=='app'}
 function initFirebase(){
   try{
-    if(!window.firebase||!firebase.auth) throw new Error('sdk');
+    if(!window.firebase||!firebase.firestore) throw new Error('sdk');
     if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-    AUTH=firebase.auth();
-    AUTH.languageCode='ar';           /* نص رسالة SMS وواجهة reCAPTCHA بالعربية */
     FS=firebase.firestore();
     try{RT=firebase.database();RT.ref('.info/connected').on('value',s=>{RT_OK=!!s.val();setConn(RT_OK?'live':'bad',RT_OK?'متصل':'غير متصل');if(!RT_OK&&G.on){G.err='لا يوجد اتصال بقاعدة بيانات الموقع (Realtime Database). تحقّق من الإنترنت ومن رابط databaseURL.';renderGps()}})}catch(e){console.warn('rtdb',e);setConn('live','متصل')}
     return true;
@@ -357,7 +323,7 @@ function busFrom(id,d){
   return {id,order:+d.order||0,f:Object.assign({},d.f||{}),school:sc,t:[(d.t1||[]).map(pf).filter(p=>isFinite(p.lat)),(d.t2||[]).map(pf).filter(p=>isFinite(p.lat))]};
 }
 
-/* ---------- الدخول برقم الهاتف + رمز التحقق SMS (Firebase Phone Auth) ---------- */
+/* ---------- الدخول برقم الهاتف + الرمز السري ---------- */
 async function findBuses(raw){
   const n=normPhone(raw);
   if(n.length<7) throw new Error('short');
@@ -371,164 +337,70 @@ async function findBuses(raw){
   return docs.filter(d=>(d.data()||{}).v===2).map(d=>busFrom(d.id,d.data())).sort((a,b)=>a.order-b.order);
 }
 
-/* رسائل أخطاء Firebase بالعربية */
-function authMsg(x){
-  const c=x&&x.code||'';
-  const M={
-    'auth/invalid-phone-number':'رقم الهاتف غير صحيح. اكتب الرقم كاملاً (8 أرقام).',
-    'auth/missing-phone-number':'اكتب رقم الهاتف أولاً.',
-    'auth/too-many-requests':'محاولات كثيرة من هذا الجهاز. انتظر قليلاً ثم أعد المحاولة.',
-    'auth/quota-exceeded':'تجاوز التطبيق الحد اليومي لرسائل التحقق. راجع إدارة المدرسة.',
-    'auth/invalid-verification-code':'الرمز غير صحيح. تأكد منه وأعد المحاولة.',
-    'auth/missing-verification-code':'اكتب رمز التحقق المكوّن من 6 أرقام.',
-    'auth/code-expired':'انتهت صلاحية الرمز. اضغط «إعادة الإرسال» لتصلك رسالة جديدة.',
-    'auth/session-expired':'انتهت صلاحية الرمز. اضغط «إعادة الإرسال» لتصلك رسالة جديدة.',
-    'auth/captcha-check-failed':'فشل التحقق الأمني (reCAPTCHA). أعد تحميل الصفحة ثم حاول مجدداً.',
-    'auth/invalid-app-credential':'فشل التحقق الأمني (reCAPTCHA). أعد تحميل الصفحة ثم حاول مجدداً.',
-    'auth/unauthorized-domain':'نطاق هذه الصفحة غير مُضاف في Authorized domains في Firebase.',
-    'auth/operation-not-allowed':'الدخول برقم الهاتف غير مفعّل لهذه المنطقة في Firebase. راجع إدارة المدرسة.',
-    'auth/billing-not-enabled':'إرسال رسائل SMS يتطلب تفعيل خطة Blaze في مشروع Firebase.',
-    'auth/network-request-failed':'تعذّر الاتصال. تحقّق من الإنترنت ثم أعد المحاولة.',
-    'auth/user-disabled':'هذا الحساب موقوف. راجع إدارة المدرسة.',
-    'permission-denied':'قواعد أمان Firestore تمنع القراءة. راجع إدارة المدرسة.'
-  };
-  return M[c]||'تعذّر إكمال العملية. تحقّق من الإنترنت ثم أعد المحاولة.';
-}
-
-/* reCAPTCHA غير مرئي: مطلوب من Firebase قبل إرسال أي رسالة SMS */
-let RV=null, CONF=null, PENDING='', resendT=null;
-function recaptcha(){
-  if(RV) return RV;
-  const box=$('#recaptcha-box'); box.innerHTML='<div></div>';
-  RV=new firebase.auth.RecaptchaVerifier(box.firstChild,{size:'invisible','expired-callback':resetRecaptcha});
-  return RV;
-}
-function resetRecaptcha(){try{RV&&RV.clear()}catch(e){} RV=null; $('#recaptcha-box').innerHTML=''}
-async function sendCode(e164){
-  resetRecaptcha();
-  try{CONF=await AUTH.signInWithPhoneNumber(e164,recaptcha())}
-  catch(x){resetRecaptcha();throw x}
-}
-
 function busy(btn,txt){btn.disabled=true;btn.dataset.t=btn.dataset.t||btn.textContent;btn.textContent=txt}
 function idle(btn){btn.disabled=false;if(btn.dataset.t)btn.textContent=btn.dataset.t}
-function showPhoneStep(){
-  clearInterval(resendT); CONF=null;
-  $('#otp-form').hidden=true; $('#login-form').hidden=false;
-  $('#otp').value=''; $('#otp-err').textContent='';
-}
-function showOtpStep(){
-  $('#login-form').hidden=true; $('#otp-form').hidden=false;
-  $('#otp-to').textContent=prettyPhone(PENDING);
-  $('#otp').value=''; $('#otp-err').textContent='';
-  startResendTimer();
-  setTimeout(()=>$('#otp').focus(),50);
-}
-function startResendTimer(){
-  const b=$('#otp-resend'); let left=RESEND_S;
-  clearInterval(resendT); b.disabled=true;
-  const tick=()=>{if(left<=0){clearInterval(resendT);b.disabled=false;b.textContent='إعادة الإرسال';return}
-    b.textContent='إعادة الإرسال بعد '+left+' ث'; left--};
-  tick(); resendT=setInterval(tick,1000);
+const loadErr=x=>x&&x.code==='permission-denied'?'قواعد أمان Firestore تمنع قراءة بيانات الحافلات. راجع إدارة المدرسة.':'تعذّر تحميل بيانات الحافلة. تحقّق من الإنترنت ثم أعد المحاولة.';
+function showLogin(msg){
+  view('login'); $('#login-err').textContent=msg||'';
+  setTimeout(()=>{if(!$('#v-login').hidden)$('#phone').focus()},50);
 }
 
-/* الخطوة 1: التحقق من أن الرقم مسجّل لحافلة، ثم إرسال الرمز */
 $('#login-form').addEventListener('submit',async e=>{
   e.preventDefault();
-  const err=$('#login-err'), btn=$('#login-btn'), e164=toE164($('#phone').value);
+  const err=$('#login-err'), btn=$('#login-btn');
+  const n=normPhone($('#phone').value), pin=latinDigits($('#pin').value).trim();
   err.textContent='';
-  if(!e164){err.textContent='اكتب رقم الهاتف كاملاً (8 أرقام).';return}
-  if(!AUTH||!FS){err.textContent='تعذّر الاتصال بـ Firebase. تحقّق من الإنترنت ثم أعد تحميل الصفحة.';return}
-  busy(btn,'جارٍ التحقق من الرقم…');
-  try{
-    /* فحص مبدئي يوفّر رسائل SMS على الأرقام غير المسجّلة.
-       إن كانت قواعد Firestore تشترط تسجيل الدخول للقراءة، نتجاوزه ويُعاد الفحص بعد التحقق. */
-    let known=null;
-    try{known=(await findBuses(e164)).length>0}catch(x){if(!x||x.code!=='permission-denied')throw x}
-    if(known===false){err.textContent='هذا الرقم غير مسجّل كرقم سائق لأي حافلة. تأكد من الرقم أو راجع إدارة المدرسة.';return}
-    btn.textContent='جارٍ إرسال الرمز…';
-    await sendCode(e164);
-    PENDING=e164; showOtpStep();
-  }catch(x){console.error(x);err.textContent=authMsg(x)}
-  finally{idle(btn)}
-});
-
-/* الخطوة 2: تأكيد الرمز. بعد النجاح يتولى onAuthStateChanged فتح ملف الحافلة */
-async function confirmCode(){
-  const err=$('#otp-err'), btn=$('#otp-btn'), code=latinDigits($('#otp').value).replace(/\D/g,'');
-  err.textContent='';
-  if(code.length!==6){err.textContent='اكتب رمز التحقق المكوّن من 6 أرقام.';return}
-  if(!CONF){showPhoneStep();$('#login-err').textContent='انتهت الجلسة. أعد إرسال الرمز.';return}
+  if(n.length<7){err.textContent='اكتب رقم الهاتف كاملاً (8 أرقام).';$('#phone').focus();return}
+  if(pin!==PIN){err.textContent='الرمز السري غير صحيح.';$('#pin').select();return}
+  if(!FS){err.textContent='تعذّر الاتصال بـ Firebase. تحقّق من الإنترنت ثم أعد تحميل الصفحة.';return}
   if(btn.disabled) return;
-  busy(btn,'جارٍ التأكيد…');
-  try{await CONF.confirm(code)}
-  catch(x){console.error(x);err.textContent=authMsg(x);$('#otp').select()}
+  busy(btn,'جارٍ الدخول…');
+  try{
+    const list=await findBuses(n);
+    if(!list.length){err.textContent='هذا الرقم غير مسجّل كرقم سائق لأي حافلة. تأكد من الرقم أو راجع إدارة المدرسة.';return}
+    $('#pin').value='';
+    enter(n,list,null);
+  }catch(x){console.error(x);err.textContent=loadErr(x)}
   finally{idle(btn)}
-}
-$('#otp-form').addEventListener('submit',e=>{e.preventDefault();confirmCode()});
-$('#otp').addEventListener('input',e=>{
-  const v=latinDigits(e.target.value).replace(/\D/g,'').slice(0,6);
-  if(v!==e.target.value) e.target.value=v;
-  if(v.length===6) confirmCode();          /* يدعم الملء التلقائي للرمز من الرسالة */
 });
-$('#otp-resend').onclick=async()=>{
-  if(!PENDING) return;
-  const b=$('#otp-resend'), err=$('#otp-err');
-  b.disabled=true; b.textContent='جارٍ الإرسال…'; err.textContent='';
-  try{await sendCode(PENDING);toast('أُعيد إرسال رمز التحقق');startResendTimer();$('#otp').value='';$('#otp').focus()}
-  catch(x){console.error(x);err.textContent=authMsg(x);b.disabled=false;b.textContent='إعادة الإرسال'}
-};
-$('#otp-back').onclick=()=>{PENDING='';showPhoneStep();$('#login-err').textContent='';setTimeout(()=>$('#phone').focus(),50)};
+$('#pin').addEventListener('input',e=>{
+  const v=latinDigits(e.target.value).replace(/\D/g,'').slice(0,4);
+  if(v!==e.target.value) e.target.value=v;
+});
 
-/* بعد تسجيل الدخول: مطابقة رقم Firebase الموثّق مع حافلات المدرسة */
-let authSeq=0;
-async function onUser(u){
-  const seq=++authSeq;
-  if(!u){
-    if(A.bus) clearApp();
-    showPhoneStep(); view('login');
-    setTimeout(()=>{if(!$('#v-login').hidden&&!$('#login-form').hidden)$('#phone').focus()},50);
-    return;
-  }
-  if(!u.phoneNumber){await AUTH.signOut().catch(()=>{});return}
+/* فتح الجلسة المحفوظة على الجهاز دون إعادة إدخال الرمز */
+async function restore(s){
   $('#boot-msg').textContent='جارٍ فتح ملف الحافلة…'; $('#boot-acts').hidden=true; view('boot');
   try{
-    const list=await findBuses(u.phoneNumber);
-    if(seq!==authSeq) return;
-    if(!list.length){logout('هذا الرقم غير مسجّل كرقم سائق لأي حافلة. راجع إدارة المدرسة.');return}
-    let s=null; try{s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){}
-    PENDING=''; clearInterval(resendT);
-    enter(normPhone(u.phoneNumber),u.uid,list,s&&s.busId);
+    const list=await findBuses(s.phone);
+    if(!list.length){logout('هذا الرقم لم يعد مسجّلاً كرقم سائق لأي حافلة. راجع إدارة المدرسة.');return}
+    enter(normPhone(s.phone),list,s.busId);
   }catch(x){
-    if(seq!==authSeq) return;
     console.error(x);
-    /* لا نسجّل خروجه عند انقطاع الإنترنت كي لا يحتاج رسالة SMS جديدة */
-    $('#boot-msg').textContent=x&&x.code==='permission-denied'?'قواعد أمان Firestore تمنع قراءة بيانات الحافلات. راجع إدارة المدرسة.':'تعذّر تحميل بيانات الحافلة. تحقّق من الإنترنت ثم أعد المحاولة.';
+    $('#boot-msg').textContent=loadErr(x);
     $('#boot-acts').hidden=false;
   }
 }
-$('#boot-retry').onclick=()=>{if(AUTH&&AUTH.currentUser)onUser(AUTH.currentUser);else location.reload()};
+$('#boot-retry').onclick=()=>{const s=getSession();if(s&&s.phone)restore(s);else location.reload()};
 $('#boot-out').onclick=()=>logout();
 
 function clearApp(){
   unsub.forEach(f=>{try{f()}catch(e){}}); unsub=[];
-  A.phone='';A.uid='';A.buses=[];A.bus=null;A.students=[];A.lights={};
+  A.phone='';A.buses=[];A.bus=null;A.students=[];A.lights={};
 }
 async function logout(msg){
-  const p=gpsStop(true);                     /* نرسل active:false قبل الخروج لأن القواعد قد تشترط تسجيل الدخول */
+  const p=gpsStop(true);                     /* نرسل active:false قبل الخروج */
   if(p) await Promise.race([p,new Promise(r=>setTimeout(r,1500))]);
   clearApp();
   try{localStorage.removeItem(SESSION_KEY);localStorage.removeItem(GPS_KEY)}catch(e){}
-  PENDING=''; $('#phone').value=''; showPhoneStep();
-  $('#login-err').textContent=msg||'';
-  view('login');
-  if(AUTH&&AUTH.currentUser) AUTH.signOut().catch(e=>console.warn('signOut',e));
+  $('#phone').value=''; $('#pin').value='';
+  showLogin(msg);
 }
-$('#logout').onclick=()=>ask({title:'تسجيل الخروج؟',desc:(G.on?'سيتوقف إرسال موقع الحافلة. ':'')+'ستحتاج رمز تحقق جديداً للدخول مرة أخرى.',ok:'خروج'},()=>logout());
+$('#logout').onclick=()=>ask({title:'تسجيل الخروج؟',desc:(G.on?'سيتوقف إرسال موقع الحافلة. ':'')+'ستحتاج رقم هاتفك والرمز السري للدخول مرة أخرى.',ok:'خروج'},()=>logout());
 
 /* ---------- الدخول إلى ملف السائق والاستماع للتغييرات ---------- */
-function enter(phone,uid,list,busId){
-  A.phone=phone; A.uid=uid; A.buses=list;
+function enter(phone,list,busId){
+  A.phone=phone; A.buses=list;
   selectBus(list.find(b=>b.id===busId)||list[0]);
   view('app');
 }
@@ -536,7 +408,7 @@ function selectBus(b){
   if(A.bus&&A.bus.id!==b.id) gpsStop(true);
   unsub.forEach(f=>{try{f()}catch(e){}}); unsub=[];
   A.bus=b; A.lights={};
-  try{localStorage.setItem(SESSION_KEY,JSON.stringify({busId:b.id}))}catch(e){}
+  try{localStorage.setItem(SESSION_KEY,JSON.stringify({phone:A.phone,busId:b.id}))}catch(e){}
   render();
   /* بيانات الحافلة: إن غيّرت الإدارة رقم السائق يُسجَّل خروجه تلقائياً */
   unsub.push(FS.collection('buses').doc(b.id).onSnapshot(d=>{
@@ -616,7 +488,7 @@ $('.periods').addEventListener('click',e=>{
 });
 function setLight(p,r,on){
   const id=`${p}-${r.key}`, b=A.bus;
-  const body={date:today(),on:!!on,at:new Date().toISOString(),busId:b.id,trip:r.trip,area:r.area,name:busName(b),src:'driver',phone:A.phone,uid:A.uid};
+  const body={date:today(),on:!!on,at:new Date().toISOString(),busId:b.id,trip:r.trip,area:r.area,name:busName(b),src:'driver',phone:A.phone};
   A.lights[id]=body; renderLamps();
   FS.collection('lights').doc(id).set(body)
     .then(()=>toast(on?'تم إرسال تأكيد الوصول للإدارة':'أُلغي تأكيد الوصول'))
@@ -677,7 +549,7 @@ function send(pt){
   /* set() لا يفشل ولا ينجح إذا لم يتصل SDK بالقاعدة (يبقى في الطابور)، لذا نراقبه بمهلة */
   let done=false;
   setTimeout(()=>{if(!done&&G.on){G.err='لم يُرسل الموقع: لا يصل التطبيق إلى Realtime Database. تأكد أن القاعدة مُنشأة وأن databaseURL صحيح.';renderGps()}},10000);
-  G.ref.set(Object.assign({},pt,{ts:firebase.database.ServerValue.TIMESTAMP,active:true,busId:b.id,code:String(b.f.code||''),driver:busName(b),uid:A.uid}))
+  G.ref.set(Object.assign({},pt,{ts:firebase.database.ServerValue.TIMESTAMP,active:true,busId:b.id,code:String(b.f.code||''),driver:busName(b),phone:A.phone}))
     .then(()=>{done=true;G.sentAt=Date.now();if(G.err.startsWith('لم يُرسل')||G.err.startsWith('لا يوجد اتصال')){G.err='';renderGps()}})
     .catch(e=>{done=true;console.error(e);G.err=e&&e.code==='PERMISSION_DENIED'?'لم يُرسل الموقع: قواعد Realtime Database تمنع الكتابة.':'لم يُرسل الموقع: تحقّق من الإنترنت.';renderGps()});
 }
@@ -725,15 +597,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#cf').classList.
 /* ---------- التشغيل ---------- */
 setInterval(()=>{if(A.bus&&today()!==renderLamps.day){renderLamps.day=today();renderLamps()}},60000);
 (function boot(){
-  const ok=initFirebase();
-  if(!ok||!AUTH){
-    view('login');
-    $('#login-err').textContent='تعذّر تحميل Firebase. تحقّق من الإنترنت ثم أعد تحميل الصفحة.';
-    return;
-  }
-  if(location.protocol==='file:'){view('login');$('#login-err').textContent='افتح التطبيق من رابط https على نطاق مُضاف في Firebase؛ رمز SMS لا يعمل من ملف محلي.';return}
-  /* Firebase يحفظ الجلسة على الجهاز، فيبقى السائق مسجّلاً حتى يضغط «خروج» */
-  AUTH.onAuthStateChanged(onUser);
+  if(!initFirebase()){showLogin('تعذّر تحميل Firebase. تحقّق من الإنترنت ثم أعد تحميل الصفحة.');return}
+  const s=getSession();
+  if(s&&s.phone) restore(s); else showLogin();
 })();
 })();
 </script>
