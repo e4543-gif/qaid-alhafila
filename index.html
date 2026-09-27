@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EBF1F8">
+<title>قائد الحافلة</title>
+<script>try{var t=localStorage.getItem("hawari.theme");document.documentElement.setAttribute("data-theme",t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light")}catch(e){document.documentElement.setAttribute("data-theme","light")}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EBF1F8; --surface:#EBF1F8; --sh-d:#BCC9DB; --sh-l:#FFFFFF;
+  --ink:#1E2A45; --muted:#5B6A84; --faint:#93A0B5;
+  --amber:#F2A516; --amber-hi:#FFE08A; --amber-ink:#4A3000;
+  --indigo:#5B6CF0; --indigo-hi:#AEB7FF;
+  --teal:#15A085; --teal-hi:#62E0C4; --red:#DB4C55; --line:rgba(30,42,69,.08);
+  --r-lg:26px; --r-md:18px;
+  --font:"Readex Pro","Segoe UI",Tahoma,"Noto Sans Arabic",system-ui,sans-serif;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#262C38; --surface:#262C38; --sh-d:#161A21; --sh-l:#343C4C;
+  --ink:#E9EDF5; --muted:#A7B1C2; --faint:#768196; --line:rgba(255,255,255,.07);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{background:var(--bg)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--indigo);outline-offset:3px}
+[hidden]{display:none!important}
+.raised{background:var(--surface);box-shadow:8px 8px 18px var(--sh-d),-8px -8px 18px var(--sh-l)}
+.raised-sm{background:var(--surface);box-shadow:4px 4px 9px var(--sh-d),-4px -4px 9px var(--sh-l)}
+.inset{background:var(--surface);box-shadow:inset 4px 4px 9px var(--sh-d),inset -4px -4px 9px var(--sh-l)}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 60px}
+
+header.top{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.logo{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;flex:none}
+.logo svg{width:28px;height:28px}
+.brand h1{margin:0;font-size:1.3rem;font-weight:700;line-height:1.2}
+.brand p{margin:0;color:var(--muted);font-size:.8rem}
+.conn{margin-inline-start:auto;display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:99px;font-size:.78rem;color:var(--muted)}
+.conn i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.conn.live i{background:var(--teal);box-shadow:0 0 8px var(--teal)}
+.conn.bad i{background:var(--red)}
+.icon-btn{width:40px;height:40px;border:0;border-radius:13px;display:grid;place-items:center;flex:none;color:var(--muted)}
+.icon-btn svg{width:19px;height:19px}
+
+.btn{border:0;border-radius:15px;padding:12px 18px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);box-shadow:4px 4px 9px var(--sh-d),-4px -4px 9px var(--sh-l);text-decoration:none;color:var(--ink)}
+.btn:active{box-shadow:inset 3px 3px 7px var(--sh-d),inset -3px -3px 7px var(--sh-l)}
+.btn.primary{background:var(--amber);color:var(--amber-ink)}
+.btn.sm{padding:9px 13px;font-size:.84rem;border-radius:12px}
+.btn svg{width:17px;height:17px;flex:none}
+.field{width:100%;border:0;border-radius:15px;padding:14px 16px;background:var(--surface);box-shadow:inset 3px 3px 7px var(--sh-d),inset -3px -3px 7px var(--sh-l);outline:none}
+.field:focus{box-shadow:inset 3px 3px 7px var(--sh-d),inset -3px -3px 7px var(--sh-l),0 0 0 2px var(--indigo-hi)}
+select.field{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:18px 50%,24px 50%;background-size:6px 6px;background-repeat:no-repeat;padding-left:38px}
+
+/* تسجيل الدخول */
+.login{border-radius:var(--r-lg);padding:26px 22px;margin-top:8vh}
+.login h2{margin:0 0 4px;font-size:1.3rem}
+.login p{margin:0 0 20px;color:var(--muted);font-size:.9rem}
+.login label{display:block;font-weight:500;margin-bottom:8px}
+.phone{direction:ltr;text-align:left;font-size:1.35rem;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.login .btn{width:100%;margin-top:16px;padding:14px}
+.err{color:var(--red);font-size:.88rem;margin-top:12px;min-height:1.4em}
+.boot{padding:22vh 0;text-align:center;color:var(--muted)}
+
+/* الملف الشخصي */
+.who{border-radius:var(--r-lg);padding:20px;margin-bottom:22px}
+.who-top{display:flex;align-items:center;gap:14px}
+.badge{width:62px;height:62px;border-radius:20px;display:grid;place-items:center;flex:none;background:var(--amber);color:var(--amber-ink);font-weight:700;font-size:1.5rem;line-height:1;box-shadow:0 6px 16px rgba(242,165,22,.35)}
+.badge small{display:block;font-size:.62rem;font-weight:500;margin-bottom:2px}
+.who h2{margin:0;font-size:1.2rem;line-height:1.3}
+.who .ph{color:var(--muted);font-size:.86rem;direction:ltr;display:inline-block}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.facts div{border-radius:14px;padding:9px 11px;min-width:0}
+.facts b{display:block;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.facts span{font-size:.72rem;color:var(--muted)}
+.bus-pick{margin-top:14px}
+
+/* تتبع الموقع: العنصر الأبرز */
+.gps{border-radius:var(--r-lg);padding:22px 20px;margin-bottom:22px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.dial{position:relative;width:178px;height:178px;border-radius:50%;border:0;display:grid;place-items:center;background:var(--surface);box-shadow:10px 10px 22px var(--sh-d),-10px -10px 22px var(--sh-l);transition:box-shadow .3s,background .3s;color:var(--faint)}
+.dial .glyph{font-size:3.6rem;line-height:1;transition:color .3s,transform .3s}
+.dial .lbl{position:absolute;bottom:34px;left:0;right:0;font-size:.8rem;font-weight:600;letter-spacing:0}
+.dial::before,.dial::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--teal);opacity:0;pointer-events:none}
+.dial:active{transform:scale(.98)}
+.gps[data-st="seek"] .dial{box-shadow:inset 6px 6px 14px var(--sh-d),inset -6px -6px 14px var(--sh-l);color:var(--amber)}
+.gps[data-st="live"] .dial{background:radial-gradient(circle at 50% 38%,var(--teal-hi),var(--teal) 72%);box-shadow:0 0 0 1px rgba(21,160,133,.4),0 0 36px rgba(21,160,133,.55),8px 8px 18px var(--sh-d);color:#fff}
+@media (prefers-reduced-motion:no-preference){
+  .gps[data-st="live"] .dial::before{animation:ring 2.4s ease-out infinite}
+  .gps[data-st="live"] .dial::after{animation:ring 2.4s ease-out 1.2s infinite}
+  .gps[data-st="seek"] .dial .glyph{animation:blink 1.2s ease-in-out infinite}
+}
+@keyframes ring{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.45)}}
+@keyframes blink{50%{opacity:.35}}
+.gps h3{margin:20px 0 2px;font-size:1.15rem}
+.gps .desc{margin:0;color:var(--muted);font-size:.87rem;max-width:36ch}
+.gstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-top:18px}
+.gstats div{border-radius:14px;padding:9px 6px}
+.gstats b{display:block;font-size:1rem;font-variant-numeric:tabular-nums}
+.gstats span{font-size:.72rem;color:var(--muted)}
+.gps .warn{margin-top:14px;font-size:.8rem;color:var(--muted);border-radius:14px;padding:10px 12px;width:100%}
+.gps .warn.bad{color:var(--red)}
+
+/* بطاقات الوصول */
+h2.sec{font-size:1.08rem;margin:6px 4px 12px;display:flex;align-items:baseline;gap:8px}
+h2.sec small{color:var(--muted);font-weight:400;font-size:.8rem}
+.periods{display:flex;flex-direction:column;gap:18px;margin-bottom:26px}
+.period{border-radius:var(--r-lg);padding:16px}
+.period header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.period header .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none}
+.period header .ic svg{width:20px;height:20px}
+.period.m header .ic{color:var(--amber)}
+.period.e header .ic{color:var(--indigo)}
+.period header h3{margin:0;font-size:1rem}
+.period header p{margin:0;color:var(--muted);font-size:.78rem}
+.lamps{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lamp{position:relative;border:0;border-radius:var(--r-md);padding:14px 14px 12px;text-align:start;display:flex;flex-direction:column;gap:2px;min-height:100px;background:var(--surface);box-shadow:5px 5px 12px var(--sh-d),-5px -5px 12px var(--sh-l);color:var(--ink);transition:box-shadow .25s,background .25s,transform .1s}
+.lamp:active{transform:scale(.97)}
+.lamp .bulb{position:absolute;top:13px;left:13px;width:13px;height:13px;border-radius:50%;background:var(--faint);opacity:.45;transition:all .25s}
+.lamp .nm{font-weight:600;font-size:.95rem;line-height:1.35;padding-left:18px}
+.lamp .dr{font-size:.76rem;color:var(--muted)}
+.lamp .tm{font-size:.76rem;margin-top:auto;font-weight:500}
+.period.m .lamp.lit{background:radial-gradient(circle at 80% 15%,var(--amber-hi),var(--amber) 70%);box-shadow:0 0 0 1px rgba(242,165,22,.35),0 0 24px rgba(242,165,22,.5),5px 5px 12px var(--sh-d);color:var(--amber-ink)}
+.period.m .lamp.lit .dr{color:var(--amber-ink)}
+.period.m .lamp.lit .bulb{background:#FFF7D6;opacity:1;box-shadow:0 0 10px 3px #FFF1B0}
+.period.e .lamp.lit{background:radial-gradient(circle at 80% 15%,var(--indigo-hi),var(--indigo) 70%);box-shadow:0 0 0 1px rgba(91,108,240,.35),0 0 24px rgba(91,108,240,.5),5px 5px 12px var(--sh-d);color:#fff}
+.period.e .lamp.lit .dr{color:#EEF0FF}
+.period.e .lamp.lit .bulb{background:#fff;opacity:1;box-shadow:0 0 10px 3px #DDE2FF}
+.empty{color:var(--muted);font-size:.88rem;padding:14px;text-align:center;grid-column:1/-1}
+
+/* النقلات والنقاط */
+.trip{border-radius:var(--r-lg);padding:18px 16px;margin-bottom:18px}
+.trip-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.trip-h h3{margin:0;font-size:1.02rem}
+.trip-h span{color:var(--muted);font-size:.84rem}
+.gm{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.pts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.pts li{border-radius:15px;padding:10px 12px}
+.pt-row{display:flex;align-items:center;gap:10px}
+.pt-row i{width:28px;height:28px;border-radius:50%;background:var(--amber);color:var(--amber-ink);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:.8rem;flex:none}
+.trip.t2 .pt-row i{background:var(--indigo);color:#fff}
+.pt-row .c{flex:1;min-width:0}
+.pt-row .c b{font-size:.9rem;direction:ltr;display:inline-block}
+.pt-row .c span{font-size:.78rem;color:var(--muted);margin-inline-start:6px}
+.pt-row .icon-btn{width:36px;height:36px;border-radius:11px;color:var(--ink)}
+.pts details{margin-top:6px}
+.pts summary{font-size:.8rem;color:var(--muted);cursor:pointer;list-style:none}
+.pts summary::-webkit-details-marker{display:none}
+.pts summary::before{content:"▾ "}
+.pts details[open] summary::before{content:"▴ "}
+.pts ol{margin:6px 0 0;padding-inline-start:22px;font-size:.84rem}
+.school{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted);margin-top:12px;padding:0 4px}
+.school svg{width:18px;height:18px;flex:none}
+.school .btn{margin-inline-start:auto}
+
+/* تأكيد وتنبيه */
+.overlay{position:fixed;inset:0;z-index:2000;background:rgba(20,26,40,.45);display:none;align-items:flex-end;justify-content:center;padding:16px}
+.overlay.on{display:flex}
+.sheet{width:100%;max-width:520px;border-radius:26px;padding:24px 20px calc(20px + env(safe-area-inset-bottom,0px));text-align:center}
+.sheet h3{margin:0 0 6px;font-size:1.15rem}
+.sheet p{margin:0 0 20px;color:var(--muted);font-size:.9rem}
+.sheet .acts{display:flex;gap:10px}
+.sheet .acts .btn{flex:1;padding:14px}
+.sheet .btn.danger{background:var(--red);color:#fff}
+.toast{position:fixed;z-index:3000;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;padding:12px 18px;border-radius:16px;background:var(--ink);color:var(--bg);font-size:.88rem;max-width:min(92vw,520px);text-align:center;transition:all .3s}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (max-width:380px){.facts{grid-template-columns:1fr 1fr}.lamps{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo raised" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none"><rect x="5" y="4" width="22" height="20" rx="5" fill="#F2A516"/><rect x="8" y="8" width="16" height="7" rx="2" fill="#FFF3CC"/><circle cx="10.5" cy="19.5" r="1.8" fill="#4A3000"/><circle cx="21.5" cy="19.5" r="1.8" fill="#4A3000"/><rect x="7.5" y="24" width="4" height="4" rx="1.5" fill="#27324A"/><rect x="20.5" y="24" width="4" height="4" rx="1.5" fill="#27324A"/></svg>
+    </div>
+    <div class="brand"><h1>قائد الحافلة</h1><p>حافلات الحواري</p></div>
+    <div class="conn raised-sm" id="conn"><i></i><span>جارٍ الاتصال</span></div>
+    <button class="icon-btn raised-sm" id="logout" type="button" aria-label="تسجيل الخروج" title="تسجيل الخروج" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/></svg></button>
+  </header>
+
+  <main id="v-boot" class="boot">جارٍ التحميل…</main>
+
+  <main id="v-login" hidden>
+    <form class="login raised" id="login-form" novalidate>
+      <h2>دخول السائق</h2>
+      <p>أدخل رقم هاتفك المسجّل لدى إدارة المدرسة لتفتح ملف حافلتك.</p>
+      <label for="phone">رقم هاتف السائق</label>
+      <input class="field phone" id="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="9xxxxxxx" required>
+      <button class="btn primary" type="submit" id="login-btn">دخول</button>
+      <div class="err" id="login-err" role="alert"></div>
+    </form>
+  </main>
+
+  <main id="v-app" hidden>
+    <section class="who raised" id="who"></section>
+
+    <section class="gps raised" id="gps" data-st="off">
+      <button class="dial" id="gps-btn" type="button" aria-pressed="false"><span class="glyph" aria-hidden="true">ᯤ</span><span class="lbl" id="gps-lbl">تشغيل</span></button>
+      <h3 id="gps-title">تتبع الموقع متوقف</h3>
+      <p class="desc" id="gps-desc">شغّله عند بدء الرحلة لتتابع الإدارة حركة الحافلة على الخريطة.</p>
+      <div class="gstats" id="gps-stats" hidden>
+        <div class="inset"><b id="gs-acc">—</b><span>الدقة</span></div>
+        <div class="inset"><b id="gs-spd">—</b><span>السرعة</span></div>
+        <div class="inset"><b id="gs-last">—</b><span>آخر إرسال</span></div>
+      </div>
+      <div class="warn inset" id="gps-warn">أبقِ هذه الصفحة مفتوحة والشاشة مضاءة أثناء الرحلة؛ المتصفح يوقف إرسال الموقع إذا أُغلقت الشاشة أو انتقلت لتطبيق آخر.</div>
+    </section>
+
+    <h2 class="sec">بطاقات وصول الروافد <small>تظهر للإدارة فوراً</small></h2>
+    <div class="periods">
+      <div class="period m raised">
+        <header><div class="ic inset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></div><div><h3>الصباح</h3><p>الوصول إلى المدرسة</p></div></header>
+        <div class="lamps" id="lamps-m"></div>
+      </div>
+      <div class="period e raised">
+        <header><div class="ic inset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></div><div><h3>المساء</h3><p>الوصول إلى المنازل</p></div></header>
+        <div class="lamps" id="lamps-e"></div>
+      </div>
+    </div>
+
+    <h2 class="sec">الروافد ونقاط التجمع</h2>
+    <div id="trips"></div>
+  </main>
+</div>
+
+<div class="overlay" id="cf" aria-hidden="true">
+  <div class="sheet raised" role="alertdialog" aria-modal="true" aria-labelledby="cf-t" aria-describedby="cf-d">
+    <h3 id="cf-t"></h3><p id="cf-d"></p>
+    <div class="acts"><button class="btn primary" id="cf-ok" type="button"></button><button class="btn" id="cf-no" type="button">إلغاء</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Firebase: Firestore لبيانات الحافلات وبطاقات الوصول، و Realtime Database لإرسال الموقع لحظياً -->
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-database-compat.js"></script>
+<script>
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCpJQR85jQOiwitPAunRZY790JLRGUwLsQ",
+  authDomain: "bus-app-a834f.firebaseapp.com",
+  projectId: "bus-app-a834f",
+  databaseURL: "https://bus-app-a834f-default-rtdb.firebaseio.com",
+  storageBucket: "bus-app-a834f.firebasestorage.app",
+  messagingSenderId: "162222358621",
+  appId: "1:162222358621:web:7b054ab3da0d636c1c4db4",
+  measurementId: "G-V90Y59ED8H"
+};
+</script>
+<script>
+(function(){
+"use strict";
+const TZ='Asia/Muscat', LOC='ar-OM-u-nu-latn', TRIP_NAME={1:'الأولى',2:'الثانية'};
+const GPS_PATH='tracking/';          /* يقرأه تطبيق "حافلات الحواري" من الخريطة */
+const SEND_EVERY_MS=2000, SEND_MOVE_M=15, HEARTBEAT_MS=15000;
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s==null?'':s).replace(/[\s\u00A0]+/g,' ').trim();
+const hasArea=a=>a&&norm(a)&&norm(a)!=='-';
+const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const hhmm=iso=>new Date(iso).toLocaleTimeString(LOC,{timeZone:TZ,hour:'2-digit',minute:'2-digit'});
+const busNo=b=>String(b.f.code||'').trim().replace(/^b/i,'')||'؟';
+const busName=b=>norm(b.f.driver)||norm(b.f.owner)||'بدون اسم';
+const plural=(n,one,many)=>n+' '+(n===1?one:many);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),3600)}
+function hav(a,b){const R=6371e3,r=x=>x*Math.PI/180;const dLa=r(b.lat-a.lat),dLo=r(b.lng-a.lng);const h=Math.sin(dLa/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function bearing(a,b){const r=x=>x*Math.PI/180,d=x=>x*180/Math.PI;const y=Math.sin(r(b.lng-a.lng))*Math.cos(r(b.lat)),x=Math.cos(r(a.lat))*Math.sin(r(b.lat))-Math.sin(r(a.lat))*Math.cos(r(b.lat))*Math.cos(r(b.lng-a.lng));return (d(Math.atan2(y,x))+360)%360}
+/* توحيد رقم الهاتف: أرقام عربية/فارسية ← لاتينية، حذف الرموز والمسافات ومفتاح عُمان 968 */
+function normPhone(v){
+  let s=String(v==null?'':v).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/\D/g,'');
+  s=s.replace(/^00/,''); if(s.length>8&&s.startsWith('968')) s=s.slice(3);
+  return s;
+}
+
+/* ---------- الحالة ---------- */
+let FS=null, RT=null, unsub=[];
+const A={phone:'',buses:[],bus:null,students:[],lights:{}};
+const SESSION_KEY='qaid.session', GPS_KEY='qaid.gps';
+
+function setConn(cls,txt){const c=$('#conn');c.className='conn raised-sm '+cls;c.querySelector('span').textContent=txt}
+function view(v){['boot','login','app'].forEach(x=>$('#v-'+x).hidden=x!==v);$('#logout').hidden=v!=='app'}
+function initFirebase(){
+  try{
+    if(!window.firebase) throw new Error('sdk');
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    FS=firebase.firestore();
+    try{RT=firebase.database();RT.ref('.info/connected').on('value',s=>setConn(s.val()?'live':'bad',s.val()?'متصل':'غير متصل'))}catch(e){console.warn('rtdb',e);setConn('live','متصل')}
+    return true;
+  }catch(e){console.error(e);setConn('bad','غير متصل');return false}
+}
+const pf=p=>({code:String(p.code||''),lat:+p.lat,lng:+p.lng});
+function busFrom(id,d){
+  const sc=d.school&&isFinite(+d.school.lat)?{code:d.school.code||'S',lat:+d.school.lat,lng:+d.school.lng}:null;
+  return {id,order:+d.order||0,f:Object.assign({},d.f||{}),school:sc,t:[(d.t1||[]).map(pf).filter(p=>isFinite(p.lat)),(d.t2||[]).map(pf).filter(p=>isFinite(p.lat))]};
+}
+
+/* ---------- الدخول برقم هاتف السائق ---------- */
+async function findBuses(raw){
+  const n=normPhone(raw);
+  if(n.length<7) throw new Error('short');
+  const vars=[...new Set([n,'968'+n,'+968'+n,'00968'+n,norm(raw)])].filter(Boolean).slice(0,10);
+  let docs=[];
+  try{const q=await FS.collection('buses').where('f.driverPhone','in',vars).get();docs=q.docs}catch(e){console.warn('query',e)}
+  if(!docs.length){ /* احتياط: أرقام محفوظة بتنسيق مختلف (مسافات، رموز) */
+    const all=await FS.collection('buses').get();
+    docs=all.docs.filter(d=>{const x=d.data();return x&&normPhone(x.f&&x.f.driverPhone)===n});
+  }
+  return docs.filter(d=>(d.data()||{}).v===2).map(d=>busFrom(d.id,d.data())).sort((a,b)=>a.order-b.order);
+}
+$('#login-form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const err=$('#login-err'), btn=$('#login-btn'), raw=$('#phone').value;
+  err.textContent='';
+  if(normPhone(raw).length<7){err.textContent='اكتب رقم الهاتف كاملاً (8 أرقام).';return}
+  if(!FS){err.textContent='تعذّر الاتصال بقاعدة البيانات. تحقّق من الإنترنت ثم أعد المحاولة.';return}
+  btn.disabled=true; btn.textContent='جارٍ التحقق…';
+  try{
+    const list=await findBuses(raw);
+    if(!list.length){err.textContent='هذا الرقم غير مسجّل كرقم سائق لأي حافلة. تأكد من الرقم أو راجع إدارة المدرسة.';return}
+    const n=normPhone(raw);
+    try{localStorage.setItem(SESSION_KEY,JSON.stringify({phone:n,busId:list[0].id}))}catch(x){}
+    enter(n,list,list[0].id);
+  }catch(x){console.error(x);err.textContent=x&&x.code==='permission-denied'?'قواعد أمان Firestore تمنع القراءة. راجع إدارة المدرسة.':'تعذّر التحقق من الرقم. تحقّق من الإنترنت ثم أعد المحاولة.'}
+  finally{btn.disabled=false;btn.textContent='دخول'}
+});
+function logout(msg){
+  gpsStop(true);
+  unsub.forEach(f=>{try{f()}catch(e){}}); unsub=[];
+  try{localStorage.removeItem(SESSION_KEY);localStorage.removeItem(GPS_KEY)}catch(e){}
+  A.phone='';A.buses=[];A.bus=null;A.students=[];A.lights={};
+  $('#phone').value=''; $('#login-err').textContent=msg||'';
+  view('login');
+}
+$('#logout').onclick=()=>ask({title:'تسجيل الخروج؟',desc:G.on?'سيتوقف إرسال موقع الحافلة.':'يمكنك الدخول مجدداً برقم هاتفك.',ok:'خروج'},()=>logout());
+
+/* ---------- الدخول إلى ملف السائق والاستماع للتغييرات ---------- */
+function enter(phone,list,busId){
+  A.phone=phone; A.buses=list;
+  selectBus(list.find(b=>b.id===busId)||list[0]);
+  view('app');
+}
+function selectBus(b){
+  if(A.bus&&A.bus.id!==b.id) gpsStop(true);
+  unsub.forEach(f=>{try{f()}catch(e){}}); unsub=[];
+  A.bus=b; A.lights={};
+  try{localStorage.setItem(SESSION_KEY,JSON.stringify({phone:A.phone,busId:b.id}))}catch(e){}
+  render();
+  /* بيانات الحافلة: إن غيّرت الإدارة رقم السائق يُسجَّل خروجه تلقائياً */
+  unsub.push(FS.collection('buses').doc(b.id).onSnapshot(d=>{
+    const x=d.exists?d.data():null;
+    if(!x||normPhone(x.f&&x.f.driverPhone)!==A.phone){logout('لم يعد رقمك مرتبطاً بهذه الحافلة. راجع إدارة المدرسة.');return}
+    A.bus=busFrom(d.id,x); render();
+  },e=>console.warn('bus',e)));
+  /* الطلبة: يُعرض فقط طلبة نقاط هذه الحافلة */
+  unsub.push(FS.collection('classes').onSnapshot(s=>{
+    const out=[]; s.docs.forEach(d=>((d.data()||{}).list||[]).forEach(st=>out.push({name:st.n||'',pt:st.p||''})));
+    A.students=out; renderTrips();
+  },e=>console.warn('classes',e)));
+  /* حالة بطاقات الوصول الخاصة بهذه الحافلة فقط */
+  ['m','e'].forEach(p=>[1,2].forEach(t=>{
+    const id=`${p}-${b.id}-${t}`;
+    unsub.push(FS.collection('lights').doc(id).onSnapshot(d=>{A.lights[id]=d.exists?d.data():null;renderLamps()},e=>console.warn('lights',e)));
+  }));
+  if(localStorage.getItem(GPS_KEY)===b.id) setTimeout(()=>gpsStart(true),300);
+}
+
+/* ---------- العرض ---------- */
+function rafeds(b){const o=[];[1,2].forEach(t=>{if(hasArea(b.f['area'+t]))o.push({trip:t,area:norm(b.f['area'+t]),key:b.id+'-'+t})});return o}
+const ptStudents=code=>code?A.students.filter(s=>s.pt===code):[];
+function render(){renderWho();renderLamps();renderTrips();renderGps()}
+function renderWho(){
+  const b=A.bus, f=b.f;
+  const fact=(v,l)=>`<div class="inset"><b title="${esc(v)}">${esc(norm(v)||'—')}</b><span>${l}</span></div>`;
+  $('#who').innerHTML=`<div class="who-top"><div class="badge"><span><small>حافلة</small>${esc(busNo(b))}</span></div><div><h2>${esc(norm(f.driver)||'السائق')}</h2><span class="ph">${esc(norm(f.driverPhone))}</span></div></div>
+   <div class="facts">${fact(f.plate,'رقم اللوحة')}${fact(f.type,'النوع')}${fact(f.capacity,'السعة')}${fact(f.model,'الطراز')}${fact(f.trips,'عدد النقلات')}${fact(b.t[0].length+b.t[1].length,'نقاط التجمع')}</div>
+   ${A.buses.length>1?`<div class="bus-pick"><select class="field" id="bus-pick" aria-label="اختر الحافلة">${A.buses.map(x=>`<option value="${esc(x.id)}"${x.id===b.id?' selected':''}>حافلة ${esc(busNo(x))} - ${esc(norm(x.f.plate))}</option>`).join('')}</select></div>`:''}`;
+  const bp=$('#bus-pick'); if(bp) bp.onchange=e=>{const nb=A.buses.find(x=>x.id===e.target.value);if(nb)selectBus(nb)};
+}
+function lightOn(p,key){const d=A.lights[p+'-'+key];return d&&d.on&&d.date===today()?d:null}
+function renderLamps(){
+  if(!A.bus) return;
+  const R=rafeds(A.bus);
+  ['m','e'].forEach(p=>{
+    $('#lamps-'+p).innerHTML=R.map(r=>{const on=lightOn(p,r.key);
+      return `<button type="button" class="lamp${on?' lit':''}" data-p="${p}" data-k="${esc(r.key)}" aria-pressed="${on?'true':'false'}"><span class="bulb"></span><span class="nm">${esc(r.area)}</span><span class="dr">النقلة ${TRIP_NAME[r.trip]}</span><span class="tm">${on?(p==='m'?'وصلوا المدرسة ':'وصلوا المنازل ')+hhmm(on.at):'اضغط عند الوصول'}</span></button>`}).join('')
+      ||'<div class="empty">لم تسجّل الإدارة روافد لهذه الحافلة بعد.</div>';
+  });
+}
+const I_MAP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>';
+const I_PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+const gPoint=p=>`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+/* روابط اتجاهات جوجل من موقعك الحالي؛ الرابط الواحد يقبل 9 نقاط وسيطة فيُقسّم المسار الطويل */
+function gmLinks(st){
+  const ll=p=>p.lat+','+p.lng, out=[]; let origin=null;
+  for(let i=0;i<st.length;i+=10){const seg=st.slice(i,i+10), dest=seg[seg.length-1], w=seg.slice(0,-1);
+    out.push('https://www.google.com/maps/dir/?api=1&travelmode=driving'+(origin?'&origin='+ll(origin):'')+'&destination='+ll(dest)+(w.length?'&waypoints='+w.map(ll).join('%7C'):''));origin=dest}
+  return out;
+}
+function gmButtons(links,label){return links.map((u,k)=>`<a class="btn sm" href="${esc(u)}" target="_blank" rel="noopener">${I_MAP}${label}${links.length>1?` (${k+1}/${links.length})`:''}</a>`).join('')}
+function renderTrips(){
+  const b=A.bus; if(!b) return;
+  const html=[0,1].map(ti=>{
+    const pts=b.t[ti], area=norm(b.f['area'+(ti+1)]);
+    if(!pts.length&&!hasArea(area)) return '';
+    const n=pts.reduce((a,p)=>a+ptStudents(p.code).length,0);
+    const go=pts.concat(b.school?[b.school]:[]), back=pts.slice().reverse();
+    return `<section class="trip raised${ti?' t2':''}"><div class="trip-h"><h3>النقلة ${TRIP_NAME[ti+1]}</h3><span>${esc(area||'بدون اسم رافد')}، ${plural(n,'طالب','طلاب')}</span></div>
+      ${pts.length?`<div class="gm">${gmButtons(gmLinks(go),'إلى المدرسة')}${gmButtons(gmLinks(back),'العودة للمنازل')}</div>
+      <ol class="pts">${pts.map((p,i)=>{const k=ptStudents(p.code);return `<li class="inset"><div class="pt-row"><i>${i+1}</i><div class="c"><b>${esc(p.code||'—')}</b><span>${plural(k.length,'طالب','طلاب')}</span></div><a class="icon-btn raised-sm" href="${gPoint(p)}" target="_blank" rel="noopener" aria-label="فتح النقطة ${esc(p.code)} في خرائط جوجل" title="فتح في خرائط جوجل">${I_PIN}</a></div>${k.length?`<details><summary>أسماء الطلبة</summary><ol>${k.map(s=>`<li>${esc(s.name)}</li>`).join('')}</ol></details>`:''}</li>`}).join('')}</ol>
+      ${b.school?`<div class="school">${I_PIN}<span>ثم المدرسة</span><a class="btn sm" href="${gPoint(b.school)}" target="_blank" rel="noopener">موقع المدرسة</a></div>`:''}`
+      :'<div class="empty">لم تُحدد نقاط تجمع لهذه النقلة بعد.</div>'}</section>`;
+  }).join('');
+  $('#trips').innerHTML=html||'<div class="empty raised" style="border-radius:22px">لا توجد نقلات مسجّلة لهذه الحافلة.</div>';
+}
+
+/* ---------- تفعيل بطاقة الوصول (يكتب في Firestore: lights/<الفترة>-<الحافلة>-<النقلة>) ---------- */
+$('.periods').addEventListener('click',e=>{
+  const btn=e.target.closest('.lamp'); if(!btn||!A.bus) return;
+  const p=btn.dataset.p, r=rafeds(A.bus).find(x=>x.key===btn.dataset.k); if(!r) return;
+  const on=lightOn(p,r.key), where=`رافد ${r.area}، النقلة ${TRIP_NAME[r.trip]}`;
+  if(on) return ask({title:'إلغاء تأكيد الوصول؟',desc:where+'. استخدم هذا فقط إذا فعّلت البطاقة بالخطأ.',ok:'نعم، ألغِ التفعيل',danger:true},()=>setLight(p,r,false));
+  ask({title:p==='m'?'هل وصل الطلبة إلى المدرسة؟':'هل وصل الطلبة إلى منازلهم؟',desc:where,ok:'نعم، وصلوا'},()=>setLight(p,r,true));
+});
+function setLight(p,r,on){
+  const id=`${p}-${r.key}`, b=A.bus;
+  const body={date:today(),on:!!on,at:new Date().toISOString(),busId:b.id,trip:r.trip,area:r.area,name:busName(b),src:'driver',phone:A.phone};
+  A.lights[id]=body; renderLamps();
+  FS.collection('lights').doc(id).set(body)
+    .then(()=>toast(on?'تم إرسال تأكيد الوصول للإدارة':'أُلغي تأكيد الوصول'))
+    .catch(e=>{console.error(e);toast('لم يُحفظ التأكيد. تحقّق من الإنترنت ثم أعد المحاولة.')});
+}
+
+/* ---------- تتبع الموقع (Realtime Database: tracking/<الحافلة>) ---------- */
+const G={on:false,watch:null,ref:null,fix:null,sentPt:null,lastSent:0,sentAt:0,hb:null,tick:null,wake:null,err:''};
+function gpsStart(auto){
+  if(G.on||!A.bus) return;
+  if(!('geolocation' in navigator)){G.err='هذا الجهاز لا يدعم تحديد الموقع.';renderGps();return}
+  if(!window.isSecureContext){G.err='تحديد الموقع يتطلب فتح التطبيق عبر رابط آمن (https).';renderGps();return}
+  if(!RT){G.err='تعذّر الاتصال بقاعدة بيانات الموقع (Realtime Database).';renderGps();return}
+  const b=A.bus;
+  G.ref=RT.ref(GPS_PATH+b.id);
+  G.ref.onDisconnect().update({active:false,ts:firebase.database.ServerValue.TIMESTAMP});
+  G.on=true; G.err=''; G.fix=null; G.sentPt=null; G.lastSent=0;
+  try{localStorage.setItem(GPS_KEY,b.id)}catch(e){}
+  G.watch=navigator.geolocation.watchPosition(onFix,onFixErr,{enableHighAccuracy:true,maximumAge:0,timeout:30000});
+  /* نبضة كل 15 ث حتى لو كانت الحافلة واقفة، كي لا تظهر للإدارة كمنقطعة */
+  G.hb=setInterval(()=>{if(G.fix&&Date.now()-G.lastSent>=HEARTBEAT_MS) send(G.fix)},5000);
+  G.tick=setInterval(renderGpsStats,1000);
+  wakeOn(); renderGps();
+  if(!auto) toast('جارٍ تحديد موقع الحافلة…');
+}
+function gpsStop(silent){
+  if(!G.on) return;
+  if(G.watch!=null) navigator.geolocation.clearWatch(G.watch);
+  clearInterval(G.hb); clearInterval(G.tick);
+  if(G.ref){G.ref.update({active:false,ts:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{});G.ref.onDisconnect().cancel().catch(()=>{})}
+  G.on=false; G.watch=null; G.ref=null; G.fix=null;
+  try{localStorage.removeItem(GPS_KEY)}catch(e){}
+  wakeOff(); renderGps();
+  if(!silent) toast('أُوقف تتبع الموقع');
+}
+function onFix(pos){
+  const c=pos.coords;
+  const pt={lat:+c.latitude.toFixed(6),lng:+c.longitude.toFixed(6),acc:Math.round(c.accuracy||0),
+    speed:c.speed==null||isNaN(c.speed)?null:+(+c.speed).toFixed(1),
+    heading:c.heading==null||isNaN(c.heading)?null:Math.round(c.heading)};
+  if(pt.heading==null&&G.sentPt&&hav(G.sentPt,pt)>8) pt.heading=Math.round(bearing(G.sentPt,pt));
+  const first=!G.fix; G.fix=pt; G.err='';
+  const moved=G.sentPt?hav(G.sentPt,pt):Infinity;
+  if(Date.now()-G.lastSent>=SEND_EVERY_MS||moved>=SEND_MOVE_M) send(pt);
+  if(first) renderGps(); else renderGpsStats();
+}
+function onFixErr(e){
+  if(e.code===1){G.err='رُفض إذن الموقع. اسمح للمتصفح بالوصول إلى الموقع من إعدادات الهاتف ثم شغّل التتبع.';gpsStop(true);renderGps();return}
+  G.err=e.code===3?'إشارة GPS ضعيفة، ما زال التطبيق يحاول…':'تعذّر تحديد الموقع الآن، ما زال التطبيق يحاول…';
+  renderGps();
+}
+function send(pt){
+  if(!G.ref) return;
+  const b=A.bus;
+  G.lastSent=Date.now(); G.sentPt=pt;
+  G.ref.set(Object.assign({},pt,{ts:firebase.database.ServerValue.TIMESTAMP,active:true,busId:b.id,code:String(b.f.code||''),driver:busName(b)}))
+    .then(()=>{G.sentAt=Date.now();if(G.err.startsWith('لم يُرسل')){G.err='';renderGps()}})
+    .catch(e=>{console.error(e);G.err=e&&e.code==='PERMISSION_DENIED'?'لم يُرسل الموقع: قواعد Realtime Database تمنع الكتابة.':'لم يُرسل الموقع: تحقّق من الإنترنت.';renderGps()});
+}
+async function wakeOn(){try{if('wakeLock' in navigator&&document.visibilityState==='visible'){G.wake=await navigator.wakeLock.request('screen')}}catch(e){}}
+function wakeOff(){try{G.wake&&G.wake.release()}catch(e){} G.wake=null}
+document.addEventListener('visibilitychange',()=>{if(G.on&&document.visibilityState==='visible') wakeOn()});
+$('#gps-btn').onclick=()=>{
+  if(G.on) return ask({title:'إيقاف تتبع الموقع؟',desc:'لن تتمكن الإدارة من رؤية موقع الحافلة حتى تشغّله مجدداً.',ok:'إيقاف',danger:true},()=>gpsStop());
+  gpsStart(false);
+};
+function ago(ms){const s=Math.max(0,Math.round(ms/1000));return s<60?s+' ث':Math.round(s/60)+' د'}
+function renderGps(){
+  const st=!G.on?'off':G.fix?'live':'seek', box=$('#gps');
+  box.dataset.st=st;
+  $('#gps-btn').setAttribute('aria-pressed',G.on?'true':'false');
+  $('#gps-btn').setAttribute('aria-label',G.on?'إيقاف تتبع الموقع':'تشغيل تتبع الموقع');
+  $('#gps-lbl').textContent=st==='off'?'تشغيل':st==='seek'?'جارٍ التحديد':'إيقاف';
+  $('#gps-title').textContent=st==='off'?'تتبع الموقع متوقف':st==='seek'?'جارٍ تحديد الموقع…':'موقع الحافلة يُرسل الآن';
+  $('#gps-desc').textContent=st==='off'?'شغّله عند بدء الرحلة لتتابع الإدارة حركة الحافلة على الخريطة.':st==='seek'?'قف في مكان مكشوف إن طال الانتظار.':'تظهر الحافلة لحظياً على خريطة "حافلات الحواري" لدى الإدارة.';
+  $('#gps-stats').hidden=!G.on;
+  const w=$('#gps-warn'); w.classList.toggle('bad',!!G.err);
+  w.textContent=G.err||'أبقِ هذه الصفحة مفتوحة والشاشة مضاءة أثناء الرحلة؛ المتصفح يوقف إرسال الموقع إذا أُغلقت الشاشة أو انتقلت لتطبيق آخر.';
+  renderGpsStats();
+}
+function renderGpsStats(){
+  if(!G.on) return;
+  const f=G.fix;
+  $('#gs-acc').textContent=f?'±'+f.acc+' م':'—';
+  $('#gs-spd').textContent=f&&f.speed!=null?Math.round(f.speed*3.6)+' كم/س':'—';
+  $('#gs-last').textContent=G.sentAt?'قبل '+ago(Date.now()-G.sentAt):'—';
+}
+
+/* ---------- نافذة التأكيد ---------- */
+let cfDo=null;
+function ask(o,fn){
+  cfDo=fn; $('#cf-t').textContent=o.title; $('#cf-d').textContent=o.desc||'';
+  const ok=$('#cf-ok'); ok.textContent=o.ok; ok.classList.toggle('danger',!!o.danger); ok.classList.toggle('primary',!o.danger);
+  $('#cf').classList.add('on'); $('#cf').setAttribute('aria-hidden','false'); setTimeout(()=>ok.focus(),30);
+}
+function closeAsk(run){const f=cfDo;cfDo=null;$('#cf').classList.remove('on');$('#cf').setAttribute('aria-hidden','true');if(run&&f)f()}
+$('#cf-ok').onclick=()=>closeAsk(true); $('#cf-no').onclick=()=>closeAsk(false);
+$('#cf').addEventListener('click',e=>{if(e.target.id==='cf')closeAsk(false)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#cf').classList.contains('on'))closeAsk(false)});
+
+/* ---------- التشغيل ---------- */
+setInterval(()=>{if(A.bus&&today()!==renderLamps.day){renderLamps.day=today();renderLamps()}},60000);
+(async function boot(){
+  const ok=initFirebase();
+  let s=null; try{s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){}
+  if(ok&&s&&s.phone){
+    try{const list=await findBuses(s.phone); if(list.length){enter(s.phone,list,s.busId);return}}catch(e){console.warn(e)}
+    try{localStorage.removeItem(SESSION_KEY)}catch(e){}
+  }
+  view('login');
+  if(!ok) $('#login-err').textContent='تعذّر تحميل Firebase. تحقّق من الإنترنت ثم أعد تحميل الصفحة.';
+  setTimeout(()=>$('#phone').focus(),50);
+})();
+})();
+</script>
+</body>
+</html>
